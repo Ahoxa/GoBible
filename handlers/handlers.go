@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
+	"github.com/ahoxa/GoBible/models"
 )
 
 func HelloHandler(w http.ResponseWriter, req *http.Request) {
@@ -14,7 +15,12 @@ func HelloHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting article...")
+	var reqArticle models.Article
+	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	json.NewEncoder(w).Encode(reqArticle)
 }
 
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
@@ -31,25 +37,38 @@ func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		page = 1
 	}
-
-	resString := fmt.Sprintf("Article list, page %d\n", page)
-	io.WriteString(w, resString)
+	log.Printf("Page: %d\n", page)
+	articles := []models.Article{models.Article1, models.Article2}
+	json.NewEncoder(w).Encode(articles)
 }
 
 func GetArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
-	articleID, err := strconv.Atoi(mux.Vars(req)["id"])
-	if err != nil {
-		http.Error(w, "Invalid article ID", http.StatusBadRequest)
-		return
-	}
-	resString := fmt.Sprintf("Article No. %d", articleID)
-	io.WriteString(w, resString)
+	// articleID, err := strconv.Atoi(mux.Vars(req)["id"])
+
+	// if err != nil {
+	// 	http.Error(w, "Invalid article ID", http.StatusBadRequest)
+	// 	return
+	// }
+
+	article := models.Article1
+	json.NewEncoder(w).Encode(article)
+
 }
 
 func PostNiceHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Nice!")
+	var reqArticle models.Article
+	if err := json.NewDecoder(req.Body).Decode(&reqArticle); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	json.NewEncoder(w).Encode(reqArticle)
 }
 
 func PostCommentHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Posting comment...")
+	var reqComment models.Comment
+	if err := json.NewDecoder(req.Body).Decode(&reqComment); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	json.NewEncoder(w).Encode(reqComment)
 }
